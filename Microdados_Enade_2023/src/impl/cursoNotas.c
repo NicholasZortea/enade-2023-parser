@@ -2,16 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> 
-
-typedef struct CursoNotas {
-    double* NT_CE;//componente especifico
-    double* NT_GER; //componente geral
-    double media_NT_CE;
-    double media_NT_GER;
-    int CO_CURSO;
-    int numberOfNT_CE;
-    int numberOfNT_GER;
-} CursoNotas;
+#include "../header/util.h"
 
 typedef struct Nodo {
     int id;
@@ -20,24 +11,18 @@ typedef struct Nodo {
 } Nodo;
 
 #define TAM_HASH 1000
-Nodo* tabela[TAM_HASH];
-int* cursosInseridos;
+Nodo* notasHashTable[TAM_HASH];
+int* cursosNotasInseridos;
 int totalCursos = 0;
 FILE* arquivoParaLer;
 
 void descartaPrimeiraLinhaNotas();
 void InsereCursoNotasBaseadoNaLinha(char* linha);
-void insereNaTabela(CursoNotas* novoCursoNotas);
-
-
-int funcaoHash(int chave) {
-    unsigned int hash = chave * 2654435761u;
-    return hash % TAM_HASH;
-}
+void insereNanotasHashTable(CursoNotas* novoCursoNotas);
 
 CursoNotas* getOrCreateCursoNotas(int CO_CURSO) {
-    int indice = funcaoHash(CO_CURSO);
-    Nodo* atual = tabela[indice];
+    int indice = funcaoHash(CO_CURSO, TAM_HASH);
+    Nodo* atual = notasHashTable[indice];
 
     while (atual != NULL) {
         if (atual->id == CO_CURSO) {
@@ -55,28 +40,28 @@ CursoNotas* getOrCreateCursoNotas(int CO_CURSO) {
     novoCursoNotas->numberOfNT_CE = 0;
     novoCursoNotas->numberOfNT_GER = 0;
 
-    insereNaTabela(novoCursoNotas);
+    insereNanotasHashTable(novoCursoNotas);
 
     return novoCursoNotas;
 }
 
-void insereNaTabela(CursoNotas* novoCursoNotas) {
-    if(cursosInseridos != NULL){
-        cursosInseridos = realloc(cursosInseridos, (totalCursos + 1) * sizeof(int));
+void insereNanotasHashTable(CursoNotas* novoCursoNotas) {
+    if(cursosNotasInseridos != NULL){
+        cursosNotasInseridos = realloc(cursosNotasInseridos, (totalCursos + 1) * sizeof(int));
     }
     else{
-        cursosInseridos = malloc(sizeof(int));
+        cursosNotasInseridos = malloc(sizeof(int));
     }
     
     totalCursos++;
-    cursosInseridos[totalCursos - 1] = novoCursoNotas->CO_CURSO;
+    cursosNotasInseridos[totalCursos - 1] = novoCursoNotas->CO_CURSO;
 
-    int indice = funcaoHash(novoCursoNotas->CO_CURSO);
+    int indice = funcaoHash(novoCursoNotas->CO_CURSO, TAM_HASH);
     Nodo* novoNodo = (Nodo*)malloc(sizeof(Nodo));
     novoNodo->id = novoCursoNotas->CO_CURSO;
     novoNodo->curso = novoCursoNotas;
-    novoNodo->prox = tabela[indice];
-    tabela[indice] = novoNodo;
+    novoNodo->prox = notasHashTable[indice];
+    notasHashTable[indice] = novoNodo;
 }
 
 void carregarCursosNotas(char *arquivo) {
@@ -153,9 +138,9 @@ void InsereCursoNotasBaseadoNaLinha(char* linha) {
 
 void printarCursosNotas() {
     for (int i = 0; i < totalCursos; i++) {
-        int CO_CURSO = cursosInseridos[i];
-        int indice = funcaoHash(CO_CURSO);
-        Nodo* atual = tabela[indice];
+        int CO_CURSO = cursosNotasInseridos[i];
+        int indice = funcaoHash(CO_CURSO, TAM_HASH);
+        Nodo* atual = notasHashTable[indice];
 
         while (atual != NULL) {
             if (atual->id == CO_CURSO) {
@@ -179,7 +164,7 @@ void printarCursosNotas() {
 
 void liberarCursosNotas() {
     for (int i = 0; i < TAM_HASH; i++) {
-        Nodo* atual = tabela[i];
+        Nodo* atual = notasHashTable[i];
         while (atual != NULL) {
             Nodo* temp = atual;
             atual = atual->prox;
@@ -189,7 +174,7 @@ void liberarCursosNotas() {
             free(temp);
         }
     }
-    free(cursosInseridos);
+    free(cursosNotasInseridos);
 }
 
 
