@@ -36,9 +36,6 @@ int funcaoHash(int chave) {
 }
 
 CursoNotas* getOrCreateCursoNotas(int CO_CURSO) {
-    if(CO_CURSO == 50623){
-        printf("DebugAqui");
-    }
     int indice = funcaoHash(CO_CURSO);
     Nodo* atual = tabela[indice];
 
@@ -92,14 +89,15 @@ void carregarCursosNotas(char *arquivo) {
 
     descartaPrimeiraLinhaNotas();
     char linha[2048];
-
-    while (fgets(linha, sizeof(linha), arquivoParaLer)) {
+    int i = 100000;
+    while (fgets(linha, sizeof(linha), arquivoParaLer) && i >0) {
         // Verifica se a linha está vazia
         if (strlen(linha) == 0) {
             printf("Erro: Linha está vazia.\n");
             continue;
         }
         InsereCursoNotasBaseadoNaLinha(linha);
+        i--;
     }
     fclose(arquivoParaLer);
 }
@@ -140,7 +138,6 @@ void InsereCursoNotasBaseadoNaLinha(char* linha) {
     strtok(linha, ";");//descarta NU_ANO
     int CO_CURSO;
     CO_CURSO = atoi(strtok(NULL, ";"));//pega CO_CURSO
-    printf("CO_CURSO lido: %d\n", CO_CURSO);
     descartaColuna(22);
     token = strtok(NULL, ";");
     double NT_GER = token == NULL ? 0.0 : atof(token);
@@ -148,9 +145,6 @@ void InsereCursoNotasBaseadoNaLinha(char* linha) {
     token = strtok(NULL, ";");
     double NT_CE = token == NULL ? 0.0 : atof(token);//pega NT_CE
     CursoNotas* cursoNotas = getOrCreateCursoNotas(CO_CURSO);
-    if(CO_CURSO == 50623){
-        printf("DebugAqui2\n");
-    }
     cursoNotas->NT_GER = insertInArray(cursoNotas->NT_GER, NT_GER, cursoNotas->numberOfNT_GER);
     cursoNotas->numberOfNT_GER++;
     cursoNotas->NT_CE = insertInArray(cursoNotas->NT_CE, NT_CE, cursoNotas->numberOfNT_CE);
@@ -181,6 +175,21 @@ void printarCursosNotas() {
             atual = atual->prox;
         }
     }
+}
+
+void liberarCursosNotas() {
+    for (int i = 0; i < TAM_HASH; i++) {
+        Nodo* atual = tabela[i];
+        while (atual != NULL) {
+            Nodo* temp = atual;
+            atual = atual->prox;
+            free(temp->curso->NT_CE);
+            free(temp->curso->NT_GER);
+            free(temp->curso);
+            free(temp);
+        }
+    }
+    free(cursosInseridos);
 }
 
 
