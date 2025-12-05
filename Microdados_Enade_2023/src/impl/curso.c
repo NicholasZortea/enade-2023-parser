@@ -19,6 +19,7 @@ static FILE *arquivoParaLer;
 
 void descartaPrimeiraLinha();
 void InsereCursoBaseadoNaLinha(char *linha);
+void printaCurso(Curso *curso);
 
 void carregarCursos(char *nomeArquivo) {
     arquivoParaLer = fopen(nomeArquivo, "r");
@@ -170,6 +171,31 @@ void printarCursos(){
         }
     }
     printf("%d cursos carregados.\n", totalCursos);
+}
+
+void mostraInformacoesSobreCurso(int CO_CURSO){
+    Curso* curso = getCurso(CO_CURSO);
+    if(curso != NULL){
+        printaCurso(curso);
+    } else {
+        printf("Curso com CO_CURSO %d não encontrado.\n", CO_CURSO);
+    }
+}
+
+void printaCurso(Curso *curso){
+    if(curso != NULL){
+        printf("CO_CURSO: %d, CO_IES: %d, CO_CATEGAD: %d, CO_ORGACAD: %d, CO_GRUPO: %d, CO_MODALIDADE: %d, CO_MUNIC_CURSO: %d, CO_UF_CURSO: %d, CO_REGIAO_CURSO: %d\n",
+            curso->CO_CURSO,
+            curso->CO_IES,
+            curso->CO_CATEGAD,
+            curso->CO_ORGACAD,
+            curso->CO_GRUPO,
+            curso->CO_MODALIDADE,
+            curso->CO_MUNIC_CURSO,
+            curso->CO_UF_CURSO,
+            curso->CO_REGIAO_CURSO
+        );
+    }
 }
 
 void liberarCursos(){

@@ -15,4 +15,5 @@ typedef struct Curso {
 void carregarCursos(char *arquivo);
 void printarCursos();
 void liberarCursos();
+void mostraInformacoesSobreCurso(int CO_CURSO);
 #endif

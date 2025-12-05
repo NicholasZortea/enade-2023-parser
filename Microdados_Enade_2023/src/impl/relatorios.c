@@ -3,8 +3,8 @@
 #include "../header/curso.h"
 #include <stdio.h>
 
-void mostraInformacoesSobreCurso(int CO_CURSO){
-    
+void printaSobreCurso(int CO_CURSO){
+    mostraInformacoesSobreCurso(CO_CURSO);
 }
 void carregarCursosNotasRelatorio(char *arquivo){
     carregarCursosNotas(arquivo);

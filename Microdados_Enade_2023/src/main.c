@@ -2,21 +2,27 @@
 #include <stdlib.h>
 #include "header/relatorios.h"
 
+void printaMenuGeral();
+void processaEntrada(int opcao);
+void procurarCursoEspecifico();
+void listarCursosPorIES();
+void listarCursosPorUF();
+void listarCursosPorGrupo();
+void listarNotasCurso();
+
 int main(){
 
     carregarInfosCursosRelatorio("DADOS/microdados2023_arq1.txt");
-    printarrCursos();
-    liberaMemoria();
-    // int opcao;
-    // do{
-    //     printaMenuGeral();
-    //     printf("Digite a opção desejada: ");
-    //     scanf("%d", &opcao);
-    // } while(opcao != 0);
-    // carregarCursosNotasRelatorio("DADOS/microdados2023_arq3.txt");
-    // carregarInfosCursosRelatorio("DADOS/microdados2023_arq1.txt");
+    carregarCursosNotasRelatorio("DADOS/microdados2023_arq3.txt");
+    int opcao;
+    do{
+        printaMenuGeral();
+        printf("Digite a opção desejada: ");
+        scanf("%d", &opcao);
+        processaEntrada(opcao);
+    } while(opcao != 0);
 
-    // liberaMemoria();
+    liberaMemoria();
     return 0;
 }
 
@@ -65,7 +71,7 @@ void procurarCursoEspecifico(){
     printf("Digite o número do curso desejado: ");
     int codigoCurso;
     scanf("%d", &codigoCurso);
-    mostraInformacoesSobreCurso(codigoCurso);
+    printaSobreCurso(codigoCurso);
 }
 
 void printaMenuGeral(){

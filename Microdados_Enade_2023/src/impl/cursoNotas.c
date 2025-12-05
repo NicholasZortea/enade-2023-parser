@@ -74,15 +74,13 @@ void carregarCursosNotas(char *arquivo) {
 
     descartaPrimeiraLinhaNotas();
     char linha[2048];
-    int i = 100000;
-    while (fgets(linha, sizeof(linha), arquivoParaLer) && i >0) {
+    while (fgets(linha, sizeof(linha), arquivoParaLer)) {
         // Verifica se a linha está vazia
         if (strlen(linha) == 0) {
             printf("Erro: Linha está vazia.\n");
             continue;
         }
         InsereCursoNotasBaseadoNaLinha(linha);
-        i--;
     }
     fclose(arquivoParaLer);
 }
