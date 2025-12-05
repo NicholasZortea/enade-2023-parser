@@ -2,21 +2,29 @@
 #include <stdlib.h>
 #include "header/relatorios.h"
 
+void procurarCursoEspecifico();
+void printaMenuGeral();
+void processaEntrada(int opcao);
+void listarCursosPorIES();
+void listarCursosPorUF();
+void listarCursosPorGrupo();
+void listarNotasCurso();
+
 int main(){
 
-    carregarInfosCursosRelatorio("DADOS/microdados2023_arq1.txt");
-    printarrCursos();
-    liberaMemoria();
-    // int opcao;
-    // do{
-    //     printaMenuGeral();
-    //     printf("Digite a opção desejada: ");
-    //     scanf("%d", &opcao);
-    // } while(opcao != 0);
-    // carregarCursosNotasRelatorio("DADOS/microdados2023_arq3.txt");
-    // carregarInfosCursosRelatorio("DADOS/microdados2023_arq1.txt");
 
-    // liberaMemoria();
+    carregarInfosCursosRelatorio("DADOS/microdados2023_arq1.txt");
+    carregarCursosNotasRelatorio("DADOS/microdados2023_arq3.txt");
+    int opcao;
+    do{
+        printaMenuGeral();
+        printf("Digite a opção desejada: ");
+        scanf("%d", &opcao);
+        processaEntrada(opcao);
+    } while(opcao != 0);
+
+
+    liberaMemoria();
     return 0;
 }
 
@@ -50,7 +58,10 @@ void listarCursosPorIES(){
 }
 
 void listarCursosPorUF(){
-    printf("Funcionalidade listarCursosPorUF ainda não implementada.\n");
+    printf("Digite o código da UF desejada: ");
+    int codigoUF;
+    scanf("%d", &codigoUF);
+    printaCursosBaseadoNaUF(codigoUF);
 }
 
 void listarCursosPorGrupo(){
@@ -69,7 +80,6 @@ void procurarCursoEspecifico(){
 }
 
 void printaMenuGeral(){
-    printf("-------------------------------------------------\n");
     printf("Escolha uma das opções abaixo:\n");
     printf("1. Listar informações de um curso específico\n");
     printf("2. Listar cursos por IES\n");

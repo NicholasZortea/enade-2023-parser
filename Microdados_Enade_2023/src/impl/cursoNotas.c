@@ -74,15 +74,13 @@ void carregarCursosNotas(char *arquivo) {
 
     descartaPrimeiraLinhaNotas();
     char linha[2048];
-    int i = 100000;
-    while (fgets(linha, sizeof(linha), arquivoParaLer) && i >0) {
+    while (fgets(linha, sizeof(linha), arquivoParaLer)) {
         // Verifica se a linha está vazia
         if (strlen(linha) == 0) {
             printf("Erro: Linha está vazia.\n");
             continue;
         }
         InsereCursoNotasBaseadoNaLinha(linha);
-        i--;
     }
     fclose(arquivoParaLer);
 }
@@ -168,9 +166,11 @@ void liberarCursosNotas() {
         while (atual != NULL) {
             Nodo* temp = atual;
             atual = atual->prox;
-            free(temp->curso->NT_CE);
-            free(temp->curso->NT_GER);
-            free(temp->curso);
+            if(temp->curso != NULL){
+                if(temp->curso->NT_CE != NULL) free(temp->curso->NT_CE);
+                if(temp->curso->NT_GER != NULL) free(temp->curso->NT_GER);
+                free(temp->curso);
+            }
             free(temp);
         }
     }

@@ -4,6 +4,7 @@
 #include <string.h> 
 #include "../header/util.h"
 
+//estruturas
 typedef struct Nodo {
     int id;
     Curso *curso;
@@ -12,27 +13,37 @@ typedef struct Nodo {
 
 #define TAM_HASH 1000
 Nodo* tabela[TAM_HASH];
-int* cursosInseridos = NULL;
 
+//--fim estruturas
+Nodo* indiceUFHashTable[28];//sao 27 ufs no brasil
+
+//variaveis de controle
+int* cursosInseridos = NULL;
 static int totalCursos = 0;
-static FILE *arquivoParaLer;
+static FILE *arquivoParaLerCurso;
+//--fim variaveis de controle
 
 void descartaPrimeiraLinha();
 void InsereCursoBaseadoNaLinha(char *linha);
+void insereNoIndiceUF(Curso* curso);
+void insereCursoNaTabela(Curso* novoCurso);
+void printCurso(Curso* curso);
+Curso* getCurso(int CO_CURSO);
+void liberaIndiceUF();
+void createAndInsertCurso(Curso novoCurso);
 
 void carregarCursos(char *nomeArquivo) {
-    arquivoParaLer = fopen(nomeArquivo, "r");
+    arquivoParaLerCurso = fopen(nomeArquivo, "r");
     
-    if (arquivoParaLer == NULL) {
+    if (arquivoParaLerCurso == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         exit(1);
     }
 
     descartaPrimeiraLinha();
-    char linha[1048];
+    char linha[2128];
 
-    while (fgets(linha, sizeof(linha), arquivoParaLer)) {
-
+    while (fgets(linha, sizeof(linha), arquivoParaLerCurso)) {
         // Verifica se a linha está vazia
         if (strlen(linha) == 0) {
             printf("Erro: Linha está vazia.\n");
@@ -40,50 +51,7 @@ void carregarCursos(char *nomeArquivo) {
         }
         InsereCursoBaseadoNaLinha(linha);
     }
-    fclose(arquivoParaLer);
-}
-
-void insereCursoNaTabela(Curso* novoCurso) {
-    if(cursosInseridos != NULL){
-        cursosInseridos = realloc(cursosInseridos, (totalCursos + 1) * sizeof(int));
-    }
-    else{
-        cursosInseridos = malloc(sizeof(int));
-    }
-
-    int indice = funcaoHash(novoCurso->CO_CURSO, TAM_HASH);
-    Nodo* novoNodo = (Nodo*)malloc(sizeof(Nodo));
-    novoNodo->id = novoCurso->CO_CURSO;
-    novoNodo->curso = novoCurso;
-    novoNodo->prox = tabela[indice];
-    tabela[indice] = novoNodo;
-}
-
-Curso* getCurso(int CO_CURSO) {
-    int indice = funcaoHash(CO_CURSO, TAM_HASH);
-
-    Nodo* atual = tabela[indice];
-    while (atual != NULL) {
-        if (atual->id == CO_CURSO) {
-            return atual->curso;
-        }
-        atual = atual->prox;
-    }
-    return NULL;
-}
-
-void createAndInsertCurso(Curso novoCurso) {
-    Curso* cursoPtr = (Curso*)malloc(sizeof(Curso));
-    *cursoPtr = novoCurso;
-    insereCursoNaTabela(cursoPtr);
-    totalCursos++;
-    if(cursosInseridos != NULL){
-        cursosInseridos = realloc(cursosInseridos, totalCursos * sizeof(int));
-    }
-    else{
-        cursosInseridos = malloc(totalCursos * sizeof(int));
-    }
-    cursosInseridos[totalCursos - 1] = novoCurso.CO_CURSO;
+    fclose(arquivoParaLerCurso);
 }
 
 void InsereCursoBaseadoNaLinha(char *linha) {
@@ -151,6 +119,61 @@ void InsereCursoBaseadoNaLinha(char *linha) {
     createAndInsertCurso(novoCurso);
 }
 
+void createAndInsertCurso(Curso novoCurso) {
+    Curso* cursoPtr = (Curso*)malloc(sizeof(Curso));
+    *cursoPtr = novoCurso;
+    insereCursoNaTabela(cursoPtr);
+    totalCursos++;
+    if(cursosInseridos != NULL){
+        cursosInseridos = realloc(cursosInseridos, totalCursos * sizeof(int));
+    }
+    else{
+        cursosInseridos = malloc(totalCursos * sizeof(int));
+    }
+    cursosInseridos[totalCursos - 1] = novoCurso.CO_CURSO;
+    insereNoIndiceUF(cursoPtr);
+}
+
+void insereCursoNaTabela(Curso* novoCurso) {
+    if(cursosInseridos != NULL){
+        cursosInseridos = realloc(cursosInseridos, (totalCursos + 1) * sizeof(int));
+    }
+    else{
+        cursosInseridos = malloc(sizeof(int));
+    }
+
+    int indice = funcaoHash(novoCurso->CO_CURSO, TAM_HASH);
+    Nodo* novoNodo = (Nodo*)malloc(sizeof(Nodo));
+    novoNodo->id = novoCurso->CO_CURSO;
+    novoNodo->curso = novoCurso;
+    novoNodo->prox = tabela[indice];
+    tabela[indice] = novoNodo;
+}
+
+void insereNoIndiceUF(Curso* curso) {
+    printf("Inserindo curso CO_CURSO %d no índice de UF %d\n", curso->CO_CURSO, curso->CO_UF_CURSO);
+    int ufIndex = curso->CO_UF_CURSO; // Supondo que CO_UF_CURSO começa em 1
+    Nodo* novoNodo = (Nodo*)malloc(sizeof(Nodo));
+    novoNodo->id = curso->CO_UF_CURSO;
+    novoNodo->curso = curso;
+    novoNodo->prox = indiceUFHashTable[ufIndex];
+    indiceUFHashTable[ufIndex] = novoNodo;
+}
+
+Curso* getCurso(int CO_CURSO) {
+    int indice = funcaoHash(CO_CURSO, TAM_HASH);
+
+    Nodo* atual = tabela[indice];
+    while (atual != NULL) {
+        if (atual->id == CO_CURSO) {
+            return atual->curso;
+        }
+        atual = atual->prox;
+    }
+    return NULL;
+}
+
+
 void printarCursos(){
     for(int i = 0; i < totalCursos; i++){
         int CO_CURSO = cursosInseridos[i];
@@ -182,10 +205,54 @@ void liberarCursos(){
             free(temp);
         }
     }
+    liberaIndiceUF();
     free(cursosInseridos);
 }
 
+void getCursosPorUF(int CO_UF_CURSO){
+    Nodo* atual = indiceUFHashTable[CO_UF_CURSO];
+    while(atual != NULL){
+        printCurso(atual->curso);
+        atual = atual->prox;
+    }
+}
+
+void liberaIndiceUF(){
+    for(int i = 0; i < 28; i++){
+        Nodo* atual = indiceUFHashTable[i];
+        while(atual != NULL){
+            Nodo* temp = atual;
+            atual = atual->prox;
+            free(temp);
+        }
+    }
+}
+
 void descartaPrimeiraLinha(){
-    char linha[256];
-    fgets(linha, sizeof(linha), arquivoParaLer); //descarta primeira linha
+    char linha[2128];
+    fgets(linha, sizeof(linha), arquivoParaLerCurso); //descarta primeira linha
+}
+
+void printaInformacoesSobreCurso(int CO_CURSO){
+    Curso* curso = getCurso(CO_CURSO);
+    if(curso != NULL){
+        printCurso(curso);
+    }
+    else{
+        printf("Curso com CO_CURSO %d não encontrado.\n", CO_CURSO);
+    }
+}
+
+void printCurso(Curso* curso){
+    if(curso != NULL){
+        printf("CO_CURSO: %d\n", curso->CO_CURSO);
+        printf("CO_IES: %d\n", curso->CO_IES);
+        printf("CO_CATEGAD: %d\n", curso->CO_CATEGAD);
+        printf("CO_ORGACAD: %d\n", curso->CO_ORGACAD);
+        printf("CO_GRUPO: %d\n", curso->CO_GRUPO);
+        printf("CO_MODALIDADE: %d\n", curso->CO_MODALIDADE);
+        printf("CO_MUNIC_CURSO: %d\n", curso->CO_MUNIC_CURSO);
+        printf("CO_UF_CURSO: %d\n", curso->CO_UF_CURSO);
+        printf("CO_REGIAO_CURSO: %d\n", curso->CO_REGIAO_CURSO);
+    }
 }
