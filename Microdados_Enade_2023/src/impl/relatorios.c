@@ -8,6 +8,7 @@
 void fazJoinComCursoEPrintaGer(CursoENota* listaDeNotas);
 void fazJoinComCursoEPrintaEspec(CursoENota* listaDeNotas);
 void liberaNotas(CursoENota* listaDeNotas);
+CursoENota* reverterLista(CursoENota* head);
 
 void printaSobreCurso(int CO_CURSO){
     mostraInformacoesSobreCurso(CO_CURSO);
@@ -47,6 +48,7 @@ void liberaNotas(CursoENota* listaDeNotas){
 }
 
 void fazJoinComCursoEPrintaGer(CursoENota* listaDeNotas){
+    listaDeNotas = reverterLista(listaDeNotas);
     CursoENota* atual = listaDeNotas;
     Curso* curso = NULL;
     while(atual != NULL){
@@ -57,10 +59,13 @@ void fazJoinComCursoEPrintaGer(CursoENota* listaDeNotas){
         printf("CO_CURSO: %d, NT_GER: %.2f, IES: %d\n", curso->CO_CURSO, atual->notaGenerica, curso->CO_IES);
         atual = atual->prox;
     }
+    listaDeNotas = reverterLista(listaDeNotas);
 }
 
 void fazJoinComCursoEPrintaEspec(CursoENota* listaDeNotas){
+    listaDeNotas = reverterLista(listaDeNotas);
     CursoENota* atual = listaDeNotas;
+    
     Curso* curso = NULL;
     while(atual != NULL){
         if(curso == NULL || curso->CO_CURSO != atual->CO_CURSO){
@@ -70,6 +75,22 @@ void fazJoinComCursoEPrintaEspec(CursoENota* listaDeNotas){
         printf("CO_CURSO: %d, NT_CE: %.2f, IES: %d\n", curso->CO_CURSO, atual->notaGenerica, curso->CO_IES);
         atual = atual->prox;
     }
+    listaDeNotas = reverterLista(listaDeNotas);
+}
+
+CursoENota* reverterLista(CursoENota* head) {
+    CursoENota* prev = NULL;
+    CursoENota* atual = head;
+    CursoENota* prox = NULL;
+
+    while (atual != NULL) {
+        prox = atual->prox;  
+        atual->prox = prev;  
+        prev = atual;        
+        atual = prox;        
+    }
+
+    return prev; // Retorna o novo head (último nó da lista original)
 }
 
 void pesquisaCursoPorUF(int CO_UF_CURSO){

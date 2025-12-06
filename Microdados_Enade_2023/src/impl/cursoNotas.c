@@ -74,39 +74,21 @@ void insereNanotasHashTable(CursoNotas* novoCursoNotas) {
 }
 
 void insereNosIndicesDeNota(CursoNotas* cursoNotas){
-        int indexGerais = cursoNotas->NT_GER[cursoNotas->numberOfNT_GER - 1] * 10;
+    int indexGerais = cursoNotas->NT_GER[cursoNotas->numberOfNT_GER - 1] * 10;
     int indexEspecificas = cursoNotas->NT_CE[cursoNotas->numberOfNT_CE - 1] * 10;
-
+    
     CursoENota* novoNodoGerais = (CursoENota*)malloc(sizeof(CursoENota));
     novoNodoGerais->CO_CURSO = cursoNotas->CO_CURSO;
     novoNodoGerais->notaGenerica = cursoNotas->NT_GER[cursoNotas->numberOfNT_GER - 1];
-    novoNodoGerais->prox = NULL;
+    novoNodoGerais->prox = HASH_NOTAS_GERAIS[indexGerais];
+    HASH_NOTAS_GERAIS[indexGerais] = novoNodoGerais;
 
-    if (HASH_NOTAS_GERAIS[indexGerais] == NULL) {
-        HASH_NOTAS_GERAIS[indexGerais] = novoNodoGerais;
-    } else {
-
-        CursoENota* atual = HASH_NOTAS_GERAIS[indexGerais];
-        while (atual->prox != NULL) {
-            atual = atual->prox;
-        }
-        atual->prox = novoNodoGerais;
-    }
 
     CursoENota* novoNodoEspecificas = (CursoENota*)malloc(sizeof(CursoENota));
     novoNodoEspecificas->CO_CURSO = cursoNotas->CO_CURSO;
     novoNodoEspecificas->notaGenerica = cursoNotas->NT_CE[cursoNotas->numberOfNT_CE - 1];
-    novoNodoEspecificas->prox = NULL;
-
-    if (HASH_NOTAS_ESPECIFICAS[indexEspecificas] == NULL) {
-        HASH_NOTAS_ESPECIFICAS[indexEspecificas] = novoNodoEspecificas;
-    } else {
-        CursoENota* atual = HASH_NOTAS_ESPECIFICAS[indexEspecificas];
-        while (atual->prox != NULL) {
-            atual = atual->prox;
-        }
-        atual->prox = novoNodoEspecificas;
-    }
+    novoNodoEspecificas->prox = HASH_NOTAS_ESPECIFICAS[indexEspecificas];
+    HASH_NOTAS_ESPECIFICAS[indexEspecificas] = novoNodoEspecificas;
 }
 void carregarCursosNotas(char *arquivo) {
     arquivoParaLer = fopen(arquivo, "r");
