@@ -56,7 +56,10 @@ void listarCursosPorIES(){
 }
 
 void listarCursosPorUF(){
-    printf("Funcionalidade listarCursosPorUF ainda não implementada.\n");
+    printf("Digite o código da UF desejada: ");
+    int codigoUF;
+    scanf("%d", &codigoUF);
+    pesquisaCursoPorUF(codigoUF);
 }
 
 void listarCursosPorGrupo(){

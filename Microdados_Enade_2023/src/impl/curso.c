@@ -12,14 +12,22 @@ typedef struct Nodo {
 
 #define TAM_HASH 1000
 Nodo* tabela[TAM_HASH];
-int* cursosInseridos = NULL;
 
+//maior código é 53 
+#define NUM_UFS 54
+Nodo* tabelaUF[NUM_UFS]; 
+
+int* cursosInseridos = NULL;
 static int totalCursos = 0;
 static FILE *arquivoParaLer;
 
 void descartaPrimeiraLinha();
 void InsereCursoBaseadoNaLinha(char *linha);
 void printaCurso(Curso *curso);
+void insereNosIndices(Curso* novoCurso);
+void insereNoIndiceUF(Curso* novoCurso);
+void liberaIndices();
+void liberaIndicePorUF();
 
 void carregarCursos(char *nomeArquivo) {
     arquivoParaLer = fopen(nomeArquivo, "r");
@@ -58,6 +66,21 @@ void insereCursoNaTabela(Curso* novoCurso) {
     novoNodo->curso = novoCurso;
     novoNodo->prox = tabela[indice];
     tabela[indice] = novoNodo;
+    insereNosIndices(novoCurso);
+}
+
+void insereNosIndices(Curso* novoCurso) {
+    insereNoIndiceUF(novoCurso);
+}
+
+void insereNoIndiceUF(Curso* novoCurso) {
+    int index = novoCurso->CO_UF_CURSO;
+
+    Nodo* novoNodo = (Nodo*)malloc(sizeof(Nodo));
+    novoNodo->id = index;
+    novoNodo->curso = novoCurso;
+    novoNodo->prox = tabelaUF[index];
+    tabelaUF[index] = novoNodo;
 }
 
 Curso* getCurso(int CO_CURSO) {
@@ -182,6 +205,20 @@ void mostraInformacoesSobreCurso(int CO_CURSO){
     }
 }
 
+void printaComBaseEmUF(int CO_UF_CURSO){
+    int index = CO_UF_CURSO;
+    Nodo* atual = tabelaUF[index];
+    if(atual == NULL){
+        printf("Nenhum curso encontrado para a UF com código %d.\n", CO_UF_CURSO);
+        return;
+    }
+    printf("Cursos na UF com código %d:\n", CO_UF_CURSO);
+    while(atual != NULL){
+        printaCurso(atual->curso);
+        atual = atual->prox;
+    }
+}
+
 void printaCurso(Curso *curso){
     if(curso != NULL){
         printf("CO_CURSO: %d, CO_IES: %d, CO_CATEGAD: %d, CO_ORGACAD: %d, CO_GRUPO: %d, CO_MODALIDADE: %d, CO_MUNIC_CURSO: %d, CO_UF_CURSO: %d, CO_REGIAO_CURSO: %d\n",
@@ -209,9 +246,25 @@ void liberarCursos(){
         }
     }
     free(cursosInseridos);
+    liberaIndices();
 }
 
 void descartaPrimeiraLinha(){
     char linha[256];
     fgets(linha, sizeof(linha), arquivoParaLer); //descarta primeira linha
+}
+
+void liberaIndices(){
+    liberaIndicePorUF();
+}
+
+void liberaIndicePorUF(){
+    for(int i = 0; i < NUM_UFS; i++){
+        Nodo* atual = tabelaUF[i];
+        while(atual != NULL){
+            Nodo* temp = atual;
+            atual = atual->prox;
+            free(temp);
+        }
+    }
 }

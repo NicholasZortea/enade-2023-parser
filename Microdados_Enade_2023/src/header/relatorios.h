@@ -6,5 +6,6 @@ void carregarCursosNotasRelatorio(char *arquivo);
 void carregarInfosCursosRelatorio(char *arquivo);
 void liberaMemoria();
 void printarrCursos();
+void pesquisaCursoPorUF(int CO_UF_CURSO);
 
 #endif

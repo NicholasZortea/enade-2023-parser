@@ -13,6 +13,10 @@ void carregarInfosCursosRelatorio(char *arquivo){
     carregarCursos(arquivo);
 }
 
+void pesquisaCursoPorUF(int CO_UF_CURSO){
+    printaComBaseEmUF(CO_UF_CURSO);
+}
+
 void liberaMemoria(){
     liberarCursosNotas();
     liberarCursos();
