@@ -8,9 +8,11 @@ typedef struct CursoNotas {
     int CO_CURSO;
     int numberOfNT_CE;
     int numberOfNT_GER;
+    int notasCalculadas;
 } CursoNotas;
 
 void carregarCursosNotas(char *arquivo);
 void printarCursosNotas();
 void liberarCursosNotas();
+void mostrarInformacoesSobreNotasDoCurso(int CO_CURSO);
 #endif

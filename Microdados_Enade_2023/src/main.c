@@ -73,7 +73,10 @@ void listarCursosPorGrupo(){
 }
 
 void listarNotasCurso(){
-    printf("Funcionalidade listarNotasCurso ainda não implementada.\n");
+    printf("Digite o código do curso para listar suas notas: ");
+    int codigoCurso;
+    scanf("%d", &codigoCurso);
+    pesquisarNotasDoCurso(codigoCurso);
 }
 
 void procurarCursoEspecifico(){

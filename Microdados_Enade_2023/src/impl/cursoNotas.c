@@ -19,6 +19,7 @@ FILE* arquivoParaLer;
 void descartaPrimeiraLinhaNotas();
 void InsereCursoNotasBaseadoNaLinha(char* linha);
 void insereNanotasHashTable(CursoNotas* novoCursoNotas);
+void calculaMedias(CursoNotas* notas);
 
 CursoNotas* getOrCreateCursoNotas(int CO_CURSO) {
     int indice = funcaoHash(CO_CURSO, TAM_HASH);
@@ -39,6 +40,7 @@ CursoNotas* getOrCreateCursoNotas(int CO_CURSO) {
     novoCursoNotas->media_NT_GER = 0.0;
     novoCursoNotas->numberOfNT_CE = 0;
     novoCursoNotas->numberOfNT_GER = 0;
+    novoCursoNotas->notasCalculadas = 0;
 
     insereNanotasHashTable(novoCursoNotas);
 
@@ -173,6 +175,50 @@ void liberarCursosNotas() {
         }
     }
     free(cursosNotasInseridos);
+}
+
+void mostrarInformacoesSobreNotasDoCurso(int CO_CURSO){
+    int indice = funcaoHash(CO_CURSO, TAM_HASH);
+    Nodo* atual = notasHashTable[indice];
+
+    while (atual != NULL) {
+        if (atual->id == CO_CURSO) {
+            CursoNotas* curso = atual->curso;
+            if(atual->curso->notasCalculadas == 0){
+                //calcula medias
+                calculaMedias(curso);
+                atual->curso->notasCalculadas = 1;
+            }
+            printf("Informações sobre o curso %d:\n", CO_CURSO);
+            printf("notas NT_GER: ");
+            for (int j = 0; j < curso->numberOfNT_GER; j++) {
+                printf("%.2f ", curso->NT_GER[j]);
+            }
+            printf("\nNotas NT_CE: ");
+            for (int j = 0; j < curso->numberOfNT_CE; j++) {
+                printf("%.2f ", curso->NT_CE[j]);
+            }
+            printf("\nMédia NT_GER: %.2f\n", curso->media_NT_GER);
+            printf("Média NT_CE: %.2f\n", curso->media_NT_CE);
+            printf("\n");
+            return;
+        }
+        atual = atual->prox;
+    }
+    printf("Curso com CO_CURSO %d não encontrado.\n", CO_CURSO);
+}
+
+void calculaMedias(CursoNotas* notas){
+    notas->media_NT_CE = 0.0;
+    notas->media_NT_GER = 0.0;
+    for(int i = 0; i < notas->numberOfNT_CE; i++){
+        notas->media_NT_CE += notas->NT_CE[i];
+    }
+    for(int i = 0; i < notas->numberOfNT_GER; i++){
+        notas->media_NT_GER += notas->NT_GER[i];
+    }
+    notas->media_NT_CE = notas->numberOfNT_CE > 0 ? notas->media_NT_CE / notas->numberOfNT_CE : 0.0;
+    notas->media_NT_GER = notas->numberOfNT_GER > 0 ? notas->media_NT_GER / notas->numberOfNT_GER : 0.0;
 }
 
 
