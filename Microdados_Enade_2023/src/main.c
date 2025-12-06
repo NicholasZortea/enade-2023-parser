@@ -66,7 +66,10 @@ void listarCursosPorUF(){
 }
 
 void listarCursosPorGrupo(){
-    printf("Funcionalidade listarCursosPorGrupo ainda não implementada.\n");
+    printf("Digite o código do grupo desejado: ");
+    int codigoGrupo;
+    scanf("%d", &codigoGrupo);
+    pesquisaCursoPorGRUPO(codigoGrupo);
 }
 
 void listarNotasCurso(){

@@ -21,6 +21,10 @@ void pesquisaCursoPorIES(int CO_IES){
     printaComBaseEmIES(CO_IES);
 }
 
+void pesquisaCursoPorGRUPO(int CO_GRUPO){
+    printaComBaseEmGrupo(CO_GRUPO);
+}
+
 void liberaMemoria(){
     liberarCursosNotas();
     liberarCursos();

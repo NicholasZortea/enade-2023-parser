@@ -83,6 +83,17 @@ void insereCursoNaTabela(Curso* novoCurso) {
 void insereNosIndices(Curso* novoCurso) {
     insereNoIndiceUF(novoCurso);
     insereNoIndiceIES(novoCurso);
+    insereNoIndiceGRUPO(novoCurso);
+}
+
+void insereNoIndiceGRUPO(Curso* novoCurso) {
+    int index = funcaoHash(novoCurso->CO_GRUPO, TAM_GRUPO_HASH);
+
+    Nodo* novoNodo = (Nodo*)malloc(sizeof(Nodo));
+    novoNodo->id = novoCurso->CO_GRUPO;
+    novoNodo->curso = novoCurso;
+    novoNodo->prox = tabelaGrupo[index];
+    tabelaGrupo[index] = novoNodo;
 }
 
 void insereNoIndiceUF(Curso* novoCurso) {
@@ -255,6 +266,20 @@ void printaComBaseEmIES(int CO_IES){
     }
 }
 
+void printaComBaseEmGrupo(int CO_GRUPO){
+    int index = funcaoHash(CO_GRUPO, TAM_GRUPO_HASH);
+    Nodo* atual = tabelaGrupo[index];
+    if(atual == NULL){
+        printf("Nenhum curso encontrado para o grupo com código %d.\n", CO_GRUPO);
+        return;
+    }
+    printf("Cursos no grupo com código %d:\n", CO_GRUPO);
+    while(atual != NULL){
+        if(atual->id == CO_GRUPO)printaCurso(atual->curso);
+        atual = atual->prox;
+    }
+}
+
 void printaCurso(Curso *curso){
     if(curso != NULL){
         printf("CO_CURSO: %d, CO_IES: %d, CO_CATEGAD: %d, CO_ORGACAD: %d, CO_GRUPO: %d, CO_MODALIDADE: %d, CO_MUNIC_CURSO: %d, CO_UF_CURSO: %d, CO_REGIAO_CURSO: %d\n",
@@ -293,6 +318,7 @@ void descartaPrimeiraLinha(){
 void liberaIndices(){
     liberaIndicePorUF();
     liberaIndiceIES();
+    liberaIndicePorGRUPO();
 }
 
 void liberaIndicePorUF(){
@@ -309,6 +335,17 @@ void liberaIndicePorUF(){
 void liberaIndiceIES(){
     for(int i = 0; i < TAM_IES_HASH; i++){
         Nodo* atual = tabelaIES[i];
+        while(atual != NULL){
+            Nodo* temp = atual;
+            atual = atual->prox;
+            free(temp);
+        }
+    }
+}
+
+void liberaIndicePorGRUPO(){
+    for(int i = 0; i < TAM_GRUPO_HASH; i++){
+        Nodo* atual = tabelaGrupo[i];
         while(atual != NULL){
             Nodo* temp = atual;
             atual = atual->prox;
