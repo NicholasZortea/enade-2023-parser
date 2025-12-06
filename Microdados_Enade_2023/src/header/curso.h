@@ -17,4 +17,5 @@ void printarCursos();
 void liberarCursos();
 void mostraInformacoesSobreCurso(int CO_CURSO);
 void printaComBaseEmUF(int CO_UF_CURSO);
+void printaComBaseEmIES(int CO_IES);
 #endif

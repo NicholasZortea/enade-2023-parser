@@ -13,9 +13,16 @@ typedef struct Nodo {
 #define TAM_HASH 1000
 Nodo* tabela[TAM_HASH];
 
+//#####INDICES#####
 //maior código é 53 
 #define NUM_UFS 54
-Nodo* tabelaUF[NUM_UFS]; 
+Nodo* tabelaUF[NUM_UFS];
+#define TAM_IES_HASH 400
+Nodo* tabelaIES[TAM_IES_HASH];
+#define TAM_GRUPO_HASH 100
+Nodo* tabelaGrupo[TAM_GRUPO_HASH];
+
+//#################
 
 int* cursosInseridos = NULL;
 static int totalCursos = 0;
@@ -26,8 +33,12 @@ void InsereCursoBaseadoNaLinha(char *linha);
 void printaCurso(Curso *curso);
 void insereNosIndices(Curso* novoCurso);
 void insereNoIndiceUF(Curso* novoCurso);
+void insereNoIndiceIES(Curso* novoCurso);
+void insereNoIndiceGRUPO(Curso* novoCurso);
 void liberaIndices();
+void liberaIndiceIES();
 void liberaIndicePorUF();
+void liberaIndicePorGRUPO();
 
 void carregarCursos(char *nomeArquivo) {
     arquivoParaLer = fopen(nomeArquivo, "r");
@@ -71,6 +82,7 @@ void insereCursoNaTabela(Curso* novoCurso) {
 
 void insereNosIndices(Curso* novoCurso) {
     insereNoIndiceUF(novoCurso);
+    insereNoIndiceIES(novoCurso);
 }
 
 void insereNoIndiceUF(Curso* novoCurso) {
@@ -81,6 +93,16 @@ void insereNoIndiceUF(Curso* novoCurso) {
     novoNodo->curso = novoCurso;
     novoNodo->prox = tabelaUF[index];
     tabelaUF[index] = novoNodo;
+}
+
+void insereNoIndiceIES(Curso* novoCurso) {
+    int index = funcaoHash(novoCurso->CO_IES, TAM_IES_HASH);
+
+    Nodo* novoNodo = (Nodo*)malloc(sizeof(Nodo));
+    novoNodo->id = novoCurso->CO_IES;
+    novoNodo->curso = novoCurso;
+    novoNodo->prox = tabelaIES[index];
+    tabelaIES[index] = novoNodo;
 }
 
 Curso* getCurso(int CO_CURSO) {
@@ -219,6 +241,20 @@ void printaComBaseEmUF(int CO_UF_CURSO){
     }
 }
 
+void printaComBaseEmIES(int CO_IES){
+    int index = funcaoHash(CO_IES, TAM_IES_HASH);
+    Nodo* atual = tabelaIES[index];
+    if(atual == NULL){
+        printf("Nenhum curso encontrado para a IES com código %d.\n", CO_IES);
+        return;
+    }
+    printf("Cursos na IES com código %d:\n", CO_IES);
+    while(atual != NULL){
+        if(atual->id == CO_IES)printaCurso(atual->curso);
+        atual = atual->prox;
+    }
+}
+
 void printaCurso(Curso *curso){
     if(curso != NULL){
         printf("CO_CURSO: %d, CO_IES: %d, CO_CATEGAD: %d, CO_ORGACAD: %d, CO_GRUPO: %d, CO_MODALIDADE: %d, CO_MUNIC_CURSO: %d, CO_UF_CURSO: %d, CO_REGIAO_CURSO: %d\n",
@@ -256,11 +292,23 @@ void descartaPrimeiraLinha(){
 
 void liberaIndices(){
     liberaIndicePorUF();
+    liberaIndiceIES();
 }
 
 void liberaIndicePorUF(){
     for(int i = 0; i < NUM_UFS; i++){
         Nodo* atual = tabelaUF[i];
+        while(atual != NULL){
+            Nodo* temp = atual;
+            atual = atual->prox;
+            free(temp);
+        }
+    }
+}
+
+void liberaIndiceIES(){
+    for(int i = 0; i < TAM_IES_HASH; i++){
+        Nodo* atual = tabelaIES[i];
         while(atual != NULL){
             Nodo* temp = atual;
             atual = atual->prox;

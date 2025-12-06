@@ -52,7 +52,10 @@ void processaEntrada(int opcao){
 }
 
 void listarCursosPorIES(){
-    printf("Funcionalidade listarCursosPorIES ainda não implementada.\n");
+    printf("Digite o código da IES desejada: ");
+    int codigoIES;
+    scanf("%d", &codigoIES);
+    pesquisaCursoPorIES(codigoIES);
 }
 
 void listarCursosPorUF(){

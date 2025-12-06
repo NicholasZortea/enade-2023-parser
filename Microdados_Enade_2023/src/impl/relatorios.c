@@ -17,6 +17,10 @@ void pesquisaCursoPorUF(int CO_UF_CURSO){
     printaComBaseEmUF(CO_UF_CURSO);
 }
 
+void pesquisaCursoPorIES(int CO_IES){
+    printaComBaseEmIES(CO_IES);
+}
+
 void liberaMemoria(){
     liberarCursosNotas();
     liberarCursos();
