@@ -10,5 +10,7 @@ void pesquisaCursoPorUF(int CO_UF_CURSO);
 void pesquisaCursoPorIES(int CO_IES);
 void pesquisaCursoPorGRUPO(int CO_GRUPO);
 void pesquisarNotasDoCurso(int CO_CURSO);
+//geral = 1 para gerais, 0 para específicas
+void pesquisarMaioresNotas(int nNotas, int geral);
 
 #endif

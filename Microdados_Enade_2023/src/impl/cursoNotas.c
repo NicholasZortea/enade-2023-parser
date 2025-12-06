@@ -10,16 +10,23 @@ typedef struct Nodo {
     struct Nodo *prox; // para tratar colisões com lista encadeada
 } Nodo;
 
-#define TAM_HASH 1000
+
+
+#define TAM_HASH 1001
 Nodo* notasHashTable[TAM_HASH];
 int* cursosNotasInseridos;
 int totalCursos = 0;
 FILE* arquivoParaLer;
 
+CursoENota* HASH_NOTAS_GERAIS[TAM_HASH];
+CursoENota* HASH_NOTAS_ESPECIFICAS[TAM_HASH];
+
 void descartaPrimeiraLinhaNotas();
 void InsereCursoNotasBaseadoNaLinha(char* linha);
 void insereNanotasHashTable(CursoNotas* novoCursoNotas);
 void calculaMedias(CursoNotas* notas);
+void insereNosIndicesDeNota(CursoNotas* cursoNotas);
+void liberaIndicesNotas();
 
 CursoNotas* getOrCreateCursoNotas(int CO_CURSO) {
     int indice = funcaoHash(CO_CURSO, TAM_HASH);
@@ -66,6 +73,41 @@ void insereNanotasHashTable(CursoNotas* novoCursoNotas) {
     notasHashTable[indice] = novoNodo;
 }
 
+void insereNosIndicesDeNota(CursoNotas* cursoNotas){
+        int indexGerais = cursoNotas->NT_GER[cursoNotas->numberOfNT_GER - 1] * 10;
+    int indexEspecificas = cursoNotas->NT_CE[cursoNotas->numberOfNT_CE - 1] * 10;
+
+    CursoENota* novoNodoGerais = (CursoENota*)malloc(sizeof(CursoENota));
+    novoNodoGerais->CO_CURSO = cursoNotas->CO_CURSO;
+    novoNodoGerais->notaGenerica = cursoNotas->NT_GER[cursoNotas->numberOfNT_GER - 1];
+    novoNodoGerais->prox = NULL;
+
+    if (HASH_NOTAS_GERAIS[indexGerais] == NULL) {
+        HASH_NOTAS_GERAIS[indexGerais] = novoNodoGerais;
+    } else {
+
+        CursoENota* atual = HASH_NOTAS_GERAIS[indexGerais];
+        while (atual->prox != NULL) {
+            atual = atual->prox;
+        }
+        atual->prox = novoNodoGerais;
+    }
+
+    CursoENota* novoNodoEspecificas = (CursoENota*)malloc(sizeof(CursoENota));
+    novoNodoEspecificas->CO_CURSO = cursoNotas->CO_CURSO;
+    novoNodoEspecificas->notaGenerica = cursoNotas->NT_CE[cursoNotas->numberOfNT_CE - 1];
+    novoNodoEspecificas->prox = NULL;
+
+    if (HASH_NOTAS_ESPECIFICAS[indexEspecificas] == NULL) {
+        HASH_NOTAS_ESPECIFICAS[indexEspecificas] = novoNodoEspecificas;
+    } else {
+        CursoENota* atual = HASH_NOTAS_ESPECIFICAS[indexEspecificas];
+        while (atual->prox != NULL) {
+            atual = atual->prox;
+        }
+        atual->prox = novoNodoEspecificas;
+    }
+}
 void carregarCursosNotas(char *arquivo) {
     arquivoParaLer = fopen(arquivo, "r");
     
@@ -103,6 +145,51 @@ void descartaColuna(int qntsColunasDescartar){
     return;
 }
 
+CursoENota* getNMaioresNotasGerais(int n) {
+    CursoENota* maioresNotas = NULL;
+    int count = 0;
+
+    for (int i = TAM_HASH - 1; i >= 0 && count < n; i--) {
+        CursoENota* atual = HASH_NOTAS_GERAIS[i];
+        while (atual != NULL && count < n) {
+            // Cria um novo nó para a lista de maiores notas
+            CursoENota* novo = (CursoENota*)malloc(sizeof(CursoENota));
+            novo->CO_CURSO = atual->CO_CURSO;
+            novo->notaGenerica = atual->notaGenerica;
+            novo->prox = maioresNotas;
+            maioresNotas = novo;
+
+            count++;
+            atual = atual->prox;
+        }
+    }
+
+    return maioresNotas;
+}
+
+CursoENota* getNMaioresNotasEspecificas(int n) {
+    CursoENota* maioresNotas = NULL; // Lista encadeada para armazenar as maiores notas
+    int count = 0;
+
+    // Percorre a tabela hash de notas específicas em ordem decrescente
+    for (int i = TAM_HASH - 1; i >= 0 && count < n; i--) {
+        CursoENota* atual = HASH_NOTAS_ESPECIFICAS[i];
+        while (atual != NULL && count < n) {
+            // Cria um novo nó para a lista de maiores notas
+            CursoENota* novo = (CursoENota*)malloc(sizeof(CursoENota));
+            novo->CO_CURSO = atual->CO_CURSO;
+            novo->notaGenerica = atual->notaGenerica;
+            novo->prox = maioresNotas;
+            maioresNotas = novo;
+
+            count++;
+            atual = atual->prox;
+        }
+    }
+
+    return maioresNotas;
+}
+
 double* insertInArray(double* array, double newValue, int currentSize) {
     if (array == NULL) {
         array = malloc((currentSize + 1) * sizeof(double));
@@ -134,6 +221,7 @@ void InsereCursoNotasBaseadoNaLinha(char* linha) {
     cursoNotas->numberOfNT_GER++;
     cursoNotas->NT_CE = insertInArray(cursoNotas->NT_CE, NT_CE, cursoNotas->numberOfNT_CE);
     cursoNotas->numberOfNT_CE++;
+    insereNosIndicesDeNota(cursoNotas);
 }
 
 void printarCursosNotas() {
@@ -175,6 +263,26 @@ void liberarCursosNotas() {
         }
     }
     free(cursosNotasInseridos);
+    liberaIndicesNotas();
+}
+
+void liberaIndicesNotas(){
+    for(int i = 0; i < TAM_HASH; i++){
+        CursoENota* atual = HASH_NOTAS_GERAIS[i];
+        while(atual != NULL){
+            CursoENota* temp = atual;
+            atual = atual->prox;
+            free(temp);
+        }
+    }
+    for(int i = 0; i < TAM_HASH; i++){
+        CursoENota* atual = HASH_NOTAS_ESPECIFICAS[i];
+        while(atual != NULL){
+            CursoENota* temp = atual;
+            atual = atual->prox;
+            free(temp);
+        }
+    }
 }
 
 void mostrarInformacoesSobreNotasDoCurso(int CO_CURSO){

@@ -19,4 +19,5 @@ void mostraInformacoesSobreCurso(int CO_CURSO);
 void printaComBaseEmUF(int CO_UF_CURSO);
 void printaComBaseEmIES(int CO_IES);
 void printaComBaseEmGrupo(int CO_GRUPO);
+Curso* getCurso(int CO_CURSO);
 #endif

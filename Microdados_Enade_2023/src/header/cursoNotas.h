@@ -1,5 +1,6 @@
 #ifndef CURSO_NOTAS_H
 #define CURSO_NOTAS_H
+#include "cursoAndNota.h"
 typedef struct CursoNotas {
     double* NT_CE;//componente especifico
     double* NT_GER; //componente geral
@@ -15,4 +16,6 @@ void carregarCursosNotas(char *arquivo);
 void printarCursosNotas();
 void liberarCursosNotas();
 void mostrarInformacoesSobreNotasDoCurso(int CO_CURSO);
+CursoENota* getNMaioresNotasGerais(int n);
+CursoENota* getNMaioresNotasEspecificas(int n);
 #endif

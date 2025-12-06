@@ -9,6 +9,7 @@ void listarCursosPorIES();
 void listarCursosPorUF();
 void listarCursosPorGrupo();
 void listarNotasCurso();
+void pesquisarMaioresNotasGeralOuEspecifica();
 
 int main(){
 
@@ -43,12 +44,29 @@ void processaEntrada(int opcao){
         case 5:
             listarNotasCurso();
             break;
+        case 6:
+            pesquisarMaioresNotasGeralOuEspecifica();
+            break;
         case 0:
             printf("Saindo do programa...\n");
             break;
         default:
             printf("Opção inválida. Tente novamente.\n");
     }
+}
+
+void pesquisarMaioresNotasGeralOuEspecifica(){
+    printf("Digite o número de maiores notas a serem listadas: ");
+    int nNotas;
+    scanf("%d", &nNotas);
+    printf("Deseja listar maiores notas gerais (1) ou específicas (0)? ");
+    int tipo;
+    scanf("%d", &tipo);
+    if(tipo != 1 && tipo != 0){
+        printf("Opção inválida. Retornando ao menu principal.\n");
+        return;
+    }
+    pesquisarMaioresNotas(nNotas, tipo);
 }
 
 void listarCursosPorIES(){
@@ -94,6 +112,7 @@ void printaMenuGeral(){
     printf("3. Listar cursos por UF\n");
     printf("4. Listar cursos por grupo (área de enquadramento)\n");
     printf("5. Listar notas de um curso específico\n");
+    printf("6. Pesquisar maiores notas (geral ou específico)\n");
     printf("0. Sair\n");
     printf("--------------------------------------------------\n");
 }
